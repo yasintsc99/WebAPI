@@ -1,18 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
 using WebAPI.Models;
 using WebAPI.Services;
 namespace WebAPI.Controllers
+
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
+        private readonly IJWTAuthService _jwtService;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoryController(ICategoryService categoryService, IJWTAuthService jwtService)
         {
             _categoryService = categoryService;
+            _jwtService = jwtService;
         }
         [HttpGet]
 
@@ -77,6 +83,21 @@ namespace WebAPI.Controllers
                     return Ok(updatedcategory);
                 }
             }
+        }
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+
+        public IActionResult Authenticate([FromBody] UserLogin userLogin)
+        {
+            var token = _jwtService.Authenticate(userLogin.UserName, userLogin.Password);
+            if (token.Equals(null))
+                return Unauthorized();
+            else
+            {
+                
+                return Ok(token);
+            }
+           
         }
     }
 }
