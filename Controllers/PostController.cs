@@ -1,19 +1,21 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 using WebAPI.Models;
 using WebAPI.Services;
 
 namespace WebAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
-        public PostController(IPostService postService)
+        private readonly IJWTAuthService _jwtService;
+        public PostController(IPostService postService, IJWTAuthService jwtService)
         {
             _postService = postService;
+            _jwtService = jwtService;
 
         }
         [HttpGet]
@@ -35,10 +37,10 @@ namespace WebAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Post newPost)
         {
-            
-            if(_postService.isThere(newPost.PostID))
+
+            if (_postService.isThere(newPost.PostID))
             {
-                 return new JsonResult("The document already exists");
+                return new JsonResult("The document already exists");
             }
             else
             {
@@ -70,16 +72,24 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                if (post.Id != updatedPost.Id || (post.PostID != updatedPost.PostID))
-                {
-                    return new JsonResult("You can not change the '_id' and 'PostID' fields !");
-                }
-                else
-                {
-                    await _postService.UpdatePost(updatedPost);
-                    return Ok(updatedPost);
-                }
+                await _postService.UpdatePost(updatedPost);
+                return Ok(updatedPost);
             }
+        }
+
+        [HttpPost("authenticate")]
+        [AllowAnonymous]
+        public IActionResult Authenticate([FromBody] UserLogin userLogin)
+        {
+            var token = _jwtService.Authenticate(userLogin.UserName, userLogin.Password);
+            if (token.Equals(null))
+                return Unauthorized();
+            else
+            {
+
+                return Ok(token);
+            }
+
         }
     }
 }

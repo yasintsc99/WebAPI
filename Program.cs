@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using System.Text;
-using WebAPI.Models;
 using WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,9 +33,10 @@ builder.Services.AddSingleton<IMongoDatabase>(options =>
     var database = client.GetDatabase("Hurriyet");
     return database;
 });
-builder.Services.AddSingleton<ICategoryService,CategoryService>();
+builder.Services.AddSingleton<ICategoryService, CategoryService>();
 builder.Services.AddSingleton<IPostService, PostService>();
 builder.Services.AddSingleton<IJWTAuthService, JWTAuthService>();
+builder.Services.AddSingleton<IUserLoginService, UserLoginService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

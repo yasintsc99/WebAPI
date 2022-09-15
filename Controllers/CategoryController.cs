@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
 using WebAPI.Models;
 using WebAPI.Services;
 namespace WebAPI.Controllers
@@ -48,6 +46,7 @@ namespace WebAPI.Controllers
                 newcategory.CategoryId = lastID + 1;
                 await _categoryService.CreateCategory(newcategory);
                 return Ok(newcategory);
+                //return CreatedAtAction(nameof(Get), new { id = newcategory.Id }, newcategory);
             }
         }
         [HttpDelete]
@@ -73,20 +72,14 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                if ((category.Id != updatedcategory.Id) || (category.CategoryId != updatedcategory.CategoryId))
-                {
-                    return new JsonResult("You can not change the '_id' and 'PostID' fields !");
-                }
-                else
-                {
-                    await _categoryService.UpdateCategory(updatedcategory);
-                    return Ok(updatedcategory);
-                }
+                await _categoryService.UpdateCategory(updatedcategory);
+                return Ok(updatedcategory);
+
             }
         }
-        [AllowAnonymous]
-        [HttpPost("authenticate")]
 
+        [HttpPost("authenticate")]
+        [AllowAnonymous]
         public IActionResult Authenticate([FromBody] UserLogin userLogin)
         {
             var token = _jwtService.Authenticate(userLogin.UserName, userLogin.Password);
@@ -94,10 +87,10 @@ namespace WebAPI.Controllers
                 return Unauthorized();
             else
             {
-                
+
                 return Ok(token);
             }
-           
+
         }
     }
 }

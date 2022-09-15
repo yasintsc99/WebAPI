@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
-using System.Reflection.Metadata.Ecma335;
+﻿using MongoDB.Driver;
 using WebAPI.Models;
 namespace WebAPI.Services
 {
@@ -47,7 +45,9 @@ namespace WebAPI.Services
 
         public async Task UpdateCategory(Category category)
         {
-            await _categoryCollection.ReplaceOneAsync(x => x.CategoryId == category.CategoryId,category);
+            var update = Builders<Category>.Update.Set("Title", category.Title)
+             .Set("Description", category.Description);
+            await _categoryCollection.UpdateOneAsync(x => x.CategoryId == category.CategoryId, update);
         }
     }
 }

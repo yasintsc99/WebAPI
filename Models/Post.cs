@@ -1,11 +1,12 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace WebAPI.Models
 {
     public class Post
     {
         [BsonId]
-        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        [BsonRepresentation(BsonType.ObjectId)]
 
         public string? Id { get; set; }
 
@@ -19,12 +20,11 @@ namespace WebAPI.Models
         public string? Description { get; set; }
 
         [BsonElement("Content")]
-        public string? Content  { get; set; }
+        public string? Content { get; set; }
 
         [BsonElement("CategoryID")]
-        public int CategoryID  { get; set; }
+        public int CategoryID { get; set; }
 
-        [BsonElement("isDeleted")]
         public bool isDeleted = false;
     }
 }

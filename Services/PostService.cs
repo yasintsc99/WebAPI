@@ -12,15 +12,15 @@ namespace WebAPI.Services
         }
         public async Task<List<Post>> GetAllPosts()
         {
-            return await _postCollection.Find(x => x.isDeleted == false).ToListAsync(); 
+            return await _postCollection.Find(x => x.isDeleted == false).ToListAsync();
         }
-        public  int GetCollectionCount()
+        public int GetCollectionCount()
         {
             return _postCollection.AsQueryable().Count();
         }
         public bool isThere(int id)
         {
-            return _postCollection.Find(x=> x.PostID == id).Any();
+            return _postCollection.Find(x => x.PostID == id).Any();
         }
         public async Task<Post> GetPostByID(int id)
         {
@@ -34,12 +34,16 @@ namespace WebAPI.Services
         public async Task DeletePost(int id)
         {
             var deletePost = Builders<Post>.Update.Set("isDeleted", true);
-            await _postCollection.UpdateOneAsync(x=> x.PostID == id,deletePost);
+            await _postCollection.UpdateOneAsync(x => x.PostID == id, deletePost);
         }
 
         public async Task UpdatePost(Post post)
         {
-            await _postCollection.ReplaceOneAsync(x => x.PostID == post.PostID, post);
+            var update = Builders<Post>.Update.Set("Title", post.Title)
+                .Set("Description", post.Description)
+                .Set("Content", post.Content)
+                .Set("CategoryID", post.CategoryID);
+            await _postCollection.UpdateOneAsync(x => x.PostID == post.PostID, update);
         }
     }
 }
